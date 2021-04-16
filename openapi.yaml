@@ -1,0 +1,220 @@
+openapi: 3.0.3
+info:
+  title: Blog API
+  version: 1.0.0
+  license:
+    name: Unsere API Lizenz
+  description: OpenAPI Spezifikation für unseren Microblog
+
+servers:
+  - url: http://localhost:8080
+    description: Lokaler Test-Server
+  - url: https://example.com
+    description: Produktiv Server
+
+paths:
+  /posts:
+    get:
+      summary: Lädt alle Posts
+      description: Lädt alle Posts mit Filtermöglichkeit für tags und userId
+      operationId: getPosts
+      tags:
+        - posts
+      parameters:
+        - name: tags
+          in: query
+          description: Komma separierte Liste an Tags
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: users
+          in: query
+          description: Komma separierte Liste an UserIds
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Liste aller Posts
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/PostListe'
+    post:
+      summary: Erstellt einen Post
+      description: Erstellt einen Post für den aktuellen User
+      operationId: createPost
+      tags:
+        - posts
+      parameters:
+        - name: X-Author-Id
+          in: header
+          description: Id des Autors
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/CreatePost'
+      responses:
+        201:
+          description: Post erfolgreich erstellt
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Post'
+        404:
+          description: Übergebener Autor konnte nicht gefunden werden
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /authors:
+    get:
+      summary: Lädt alle Autoren des Systems
+      description: Gibt eine Liste aller Autoren des Systems zurück.
+      operationId: getAuthors
+      tags:
+        - authors
+      responses:
+        200:
+          description: Respose mit allen Autoren
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/AuthorList'
+    post:
+      summary: Erstellt einen Autor
+      description: Die API für die Erstellung eines Autors.
+      operationId: createAuthor
+      tags:
+        - authors
+      requestBody:
+        required: true
+        content:
+          'applicaton/json':
+            schema:
+              $ref: '#/components/schemas/Author'
+      responses:
+        201:
+          description: Autor erfolgreich erstellt
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Author'
+  /authors/{id}:
+    get:
+      summary: Lädt einen Autor mittels ID
+      description: API zum Laden eines spezifischen Autors. Die Id entspricht dabei der Autor Id.
+      operationId: getAuthorById
+      tags:
+        - authors
+      parameters:
+        - name: id
+          in: path
+          description: Die Autor Id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Response mit Autor
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Author'
+
+components:
+  schemas:
+    PostListe:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+    CreatePost:
+      type: object
+      description: Payload zur Erstellung eines Posts
+      properties:
+        text:
+          type: string
+          description: Text des Posts
+          maxLength: 140
+          example: "Hallo Welt"
+        tags:
+          type: array
+          maxItems: 10
+          example:
+            - "#Hello"
+            - "#World"
+          items:
+            type: string
+      required:
+        - text
+    Post:
+      type: object
+      description: Post Objekt
+      properties:
+        id:
+          type: string
+          description: Id des Posts
+          example: "6f43c0a1-3b8e-4491-b82b-ed5d3dcd11ea"
+        text:
+          type: string
+          description: Text des Posts
+          maxLength: 140
+          example: "Hallo Welt"
+        tags:
+          type: array
+          maxItems: 10
+          example:
+            - "#Hello"
+            - "#World"
+          items:
+            type: string
+      required:
+        - id
+        - text
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error Code
+          example: ERR_AUTHOR_NOT_FOUND
+        message:
+          type: string
+          description: Error Message
+          example: Autor konnte nicht gefunden werden
+    Author:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+          description: Der Name des Autors
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+          description: Die Email Adresse des Autors
+      required:
+        - name
+        - email
+    AuthorList:
+      type: object
+      properties:
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+      required:
+        - authors
