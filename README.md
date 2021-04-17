@@ -26,3 +26,27 @@ anlegen zu müssen, nutzen wir einen Code-Generator, der anhand einer OpenAPI Sp
 generiert. Der Code-Generator wird dabei in den Build-Prozess der Spring Boot Applikation eingebunden, damit bei jedem 
 neuen Build-Vorgang die generieren Klassen geupdated werden. Dieses Repository beinhaltet die **Java** Variante der 
 Implementierung.
+
+## API
+
+Der Aufruf von `GET http://localhost:8080/posts` liefert Stub Daten zurück, die wie folgt aussehen:
+```json
+{
+  "posts": [
+    {
+      "id": "a15097d0-fe31-4210-bc0f-63eda5ab377f",
+      "text": "hello world",
+      "tags": [
+        "#first",
+        "#hello"
+      ]
+    },
+    {
+      "id": "a6ccb231-77c8-43c7-85dc-d803d003adad",
+      "text": "second post",
+      "tags": null
+    }
+  ]
+}
+```
+Die `AuthorsAPI` ist nicht implementiert. 
